@@ -6,8 +6,10 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    can_iface = LaunchConfiguration("can_iface")
-    node_id = LaunchConfiguration("node_id")
+    arm_can_iface = LaunchConfiguration("arm_can_iface")
+    arm_node_id = LaunchConfiguration("arm_node_id")
+    hand_can_iface = LaunchConfiguration("hand_can_iface")
+    hand_node_id = LaunchConfiguration("hand_node_id")
 
     launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -17,16 +19,22 @@ def generate_launch_description():
         ),
         launch_arguments={
             "use_rviz": "true",
+            "run_robot_bringup": "true",
+            "run_move_group": "true",
             "use_mock_hardware": "false",
-            "can_iface": can_iface,
-            "node_id": node_id,
+            "arm_can_iface": arm_can_iface,
+            "arm_node_id": arm_node_id,
+            "hand_can_iface": hand_can_iface,
+            "hand_node_id": hand_node_id,
         }.items(),
     )
 
     return LaunchDescription(
         [
-            DeclareLaunchArgument("can_iface", default_value="can0"),
-            DeclareLaunchArgument("node_id", default_value="100"),
+            DeclareLaunchArgument("arm_can_iface", default_value="can0"),
+            DeclareLaunchArgument("arm_node_id", default_value="100"),
+            DeclareLaunchArgument("hand_can_iface", default_value="can0"),
+            DeclareLaunchArgument("hand_node_id", default_value="120"),
             launch,
         ]
     )

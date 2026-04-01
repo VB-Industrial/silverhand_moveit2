@@ -34,3 +34,17 @@ silverhand_arm:
     - RRTstar
     - PRMstar
     - LBKPIECE
+
+silverhand_hand:
+  planner_configs:
+    - RRTConnect
+    - RRTstar
+    - PRMstar
+    - LBKPIECE
+
+silverhand_arm_hand:
+  planner_configs:
+    - RRTConnect
+    - RRTstar
+    - PRMstar
+    - LBKPIECE

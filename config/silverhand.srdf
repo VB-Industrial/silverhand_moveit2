@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <robot name="silverhand">
   <group name="silverhand_arm">
-    <chain base_link="base_link" tip_link="link_6"/>
+    <chain base_link="base_link" tip_link="hand_gripper_link"/>
+  </group>
+
+  <group name="silverhand_hand">
+    <joint name="hand_left_finger_joint"/>
+    <joint name="hand_right_finger_joint"/>
+  </group>
+
+  <group name="silverhand_arm_hand">
+    <group name="silverhand_arm"/>
+    <group name="silverhand_hand"/>
   </group>
 
   <group_state name="home" group="silverhand_arm">
@@ -13,6 +23,27 @@
     <joint name="joint_6" value="0.0"/>
   </group_state>
 
+  <group_state name="open" group="silverhand_hand">
+    <joint name="hand_left_finger_joint" value="0.01"/>
+    <joint name="hand_right_finger_joint" value="0.01"/>
+  </group_state>
+
+  <group_state name="closed" group="silverhand_hand">
+    <joint name="hand_left_finger_joint" value="0.0"/>
+    <joint name="hand_right_finger_joint" value="0.0"/>
+  </group_state>
+
+  <group_state name="home" group="silverhand_arm_hand">
+    <joint name="joint_1" value="0.0"/>
+    <joint name="joint_2" value="0.0"/>
+    <joint name="joint_3" value="0.0"/>
+    <joint name="joint_4" value="0.0"/>
+    <joint name="joint_5" value="0.0"/>
+    <joint name="joint_6" value="0.0"/>
+    <joint name="hand_left_finger_joint" value="0.01"/>
+    <joint name="hand_right_finger_joint" value="0.01"/>
+  </group_state>
+
   <group_state name="vertical" group="silverhand_arm">
     <joint name="joint_1" value="0.0"/>
     <joint name="joint_2" value="-1.57"/>
@@ -22,7 +53,23 @@
     <joint name="joint_6" value="0.0"/>
   </group_state>
 
+  <group_state name="vertical" group="silverhand_arm_hand">
+    <joint name="joint_1" value="0.0"/>
+    <joint name="joint_2" value="-1.57"/>
+    <joint name="joint_3" value="3.14"/>
+    <joint name="joint_4" value="0.0"/>
+    <joint name="joint_5" value="0.0"/>
+    <joint name="joint_6" value="0.0"/>
+    <joint name="hand_left_finger_joint" value="0.01"/>
+    <joint name="hand_right_finger_joint" value="0.01"/>
+  </group_state>
+
   <virtual_joint name="virtual_joint" type="fixed" parent_frame="world" child_link="base_link"/>
+  <end_effector
+    name="silverhand_gripper"
+    parent_link="link_6"
+    group="silverhand_hand"
+    parent_group="silverhand_arm"/>
 
   <disable_collisions link1="base_link" link2="link_1" reason="Adjacent"/>
   <disable_collisions link1="link_1" link2="link_2" reason="Adjacent"/>
@@ -30,4 +77,8 @@
   <disable_collisions link1="link_3" link2="link_4" reason="Adjacent"/>
   <disable_collisions link1="link_4" link2="link_5" reason="Adjacent"/>
   <disable_collisions link1="link_5" link2="link_6" reason="Adjacent"/>
+  <disable_collisions link1="link_6" link2="hand_base_link" reason="Adjacent"/>
+  <disable_collisions link1="hand_base_link" link2="hand_gripper_link" reason="Adjacent"/>
+  <disable_collisions link1="hand_gripper_link" link2="hand_left_finger" reason="Adjacent"/>
+  <disable_collisions link1="hand_gripper_link" link2="hand_right_finger" reason="Adjacent"/>
 </robot>

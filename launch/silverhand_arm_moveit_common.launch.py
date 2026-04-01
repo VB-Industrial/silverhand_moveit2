@@ -3,9 +3,8 @@ import yaml
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
@@ -27,13 +26,20 @@ def load_yaml(package_name, relative_path):
 
 def generate_launch_description():
     use_rviz = LaunchConfiguration("use_rviz")
+    run_robot_bringup = LaunchConfiguration("run_robot_bringup")
+    run_move_group = LaunchConfiguration("run_move_group")
     use_mock_hardware = LaunchConfiguration("use_mock_hardware")
-    can_iface = LaunchConfiguration("can_iface")
-    node_id = LaunchConfiguration("node_id")
+    arm_can_iface = LaunchConfiguration("arm_can_iface")
+    arm_node_id = LaunchConfiguration("arm_node_id")
+    hand_can_iface = LaunchConfiguration("hand_can_iface")
+    hand_node_id = LaunchConfiguration("hand_node_id")
     rviz_config = LaunchConfiguration("rviz_config")
 
     description_file = PathJoinSubstitution(
-        [FindPackageShare("silverhand_arm_model"), "urdf", "silverhand.urdf.xacro"]
+        [FindPackageShare("silverhand_moveit2"), "urdf", "silverhand_arm_hand.urdf.xacro"]
+    )
+    ros2_controllers_file = PathJoinSubstitution(
+        [FindPackageShare("silverhand_moveit2"), "config", "ros2_controllers.yaml"]
     )
 
     robot_description_content = Command(
@@ -41,6 +47,21 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             description_file,
+            " ",
+            "use_mock_hardware:=",
+            use_mock_hardware,
+            " ",
+            "arm_can_iface:=",
+            arm_can_iface,
+            " ",
+            "arm_node_id:=",
+            arm_node_id,
+            " ",
+            "hand_can_iface:=",
+            hand_can_iface,
+            " ",
+            "hand_node_id:=",
+            hand_node_id,
         ]
     )
 
@@ -90,23 +111,48 @@ def generate_launch_description():
         executable="static_transform_publisher",
         output="screen",
         arguments=["0", "0", "0", "0", "0", "0", "world", "base_link"],
+        condition=IfCondition(run_robot_bringup),
     )
 
-    lower_bringup = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution(
-                [
-                    FindPackageShare("silverhand_arm_control"),
-                    "launch",
-                    "silverhand_arm_bringup.launch.py",
-                ]
-            )
-        ),
-        launch_arguments={
-            "use_mock_hardware": use_mock_hardware,
-            "can_iface": can_iface,
-            "node_id": node_id,
-        }.items(),
+    robot_state_publisher = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        output="screen",
+        parameters=[robot_description],
+        condition=IfCondition(run_robot_bringup),
+    )
+
+    ros2_control_node = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        output="screen",
+        parameters=[robot_description, ros2_controllers_file],
+        remappings=[("/controller_manager/robot_description", "/robot_description")],
+        condition=IfCondition(run_robot_bringup),
+    )
+
+    joint_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+        output="screen",
+        condition=IfCondition(run_robot_bringup),
+    )
+
+    arm_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["arm_controller", "--controller-manager", "/controller_manager"],
+        output="screen",
+        condition=IfCondition(run_robot_bringup),
+    )
+
+    hand_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["hand_controller", "--controller-manager", "/controller_manager"],
+        output="screen",
+        condition=IfCondition(run_robot_bringup),
     )
 
     move_group = Node(
@@ -124,6 +170,7 @@ def generate_launch_description():
             planning_scene_monitor_parameters,
             {"use_sim_time": False},
         ],
+        condition=IfCondition(run_move_group),
     )
 
     rviz = Node(
@@ -146,9 +193,13 @@ def generate_launch_description():
     return LaunchDescription(
         [
             DeclareLaunchArgument("use_rviz", default_value="true"),
+            DeclareLaunchArgument("run_robot_bringup", default_value="true"),
+            DeclareLaunchArgument("run_move_group", default_value="true"),
             DeclareLaunchArgument("use_mock_hardware", default_value="true"),
-            DeclareLaunchArgument("can_iface", default_value="can0"),
-            DeclareLaunchArgument("node_id", default_value="100"),
+            DeclareLaunchArgument("arm_can_iface", default_value="can0"),
+            DeclareLaunchArgument("arm_node_id", default_value="100"),
+            DeclareLaunchArgument("hand_can_iface", default_value="can0"),
+            DeclareLaunchArgument("hand_node_id", default_value="120"),
             DeclareLaunchArgument(
                 "rviz_config",
                 default_value=PathJoinSubstitution(
@@ -156,7 +207,11 @@ def generate_launch_description():
                 ),
             ),
             static_tf,
-            lower_bringup,
+            robot_state_publisher,
+            ros2_control_node,
+            joint_state_broadcaster_spawner,
+            arm_controller_spawner,
+            hand_controller_spawner,
             move_group,
             rviz,
         ]
