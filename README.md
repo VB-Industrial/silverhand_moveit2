@@ -18,6 +18,13 @@ Package:
 - `silverhand_system_bringup`
 
 Launch files:
+- `silverhand_system_arm_hand_direct.launch.py`
+- `silverhand_system_arm_hand_direct_mock.launch.py`
+- `silverhand_system_arm_hand_direct_real.launch.py`
+- `silverhand_system_arm_hand_moveit.launch.py`
+- `silverhand_system_rover.launch.py`
+- `silverhand_system_rover_mock.launch.py`
+- `silverhand_system_rover_real.launch.py`
 - `silverhand_system_robot.launch.py`
 - `silverhand_system_gui.launch.py`
 - `silverhand_system_view.launch.py`
@@ -49,13 +56,14 @@ sudo apt-get install -y \
 
 ## Workspace Layout
 
-Recommended layout: build `silverhand_system_bringup` together with the lower-layer arm and hand packages in the same workspace.
+Recommended layout: build `silverhand_system_bringup` together with the lower-layer arm, hand, and rover packages in the same workspace.
 
 ```bash
 ~/silver_ws/src/silverhand_arm_model
 ~/silver_ws/src/silverhand_arm_control
 ~/silver_ws/src/silverhand_hand_model
 ~/silver_ws/src/silverhand_hand_control
+~/silver_ws/src/silverhand_rover_control
 ~/silver_ws/src/silverhand_system_bringup
 ```
 
@@ -93,6 +101,7 @@ Expected packages:
 - `silverhand_arm_control`
 - `silverhand_hand_model`
 - `silverhand_hand_control`
+- `silverhand_rover_bringup`
 - `silverhand_system_bringup`
 
 ## Launch
@@ -100,6 +109,14 @@ Expected packages:
 This package supports two deployment styles:
 - role-based launch for two physical machines: `robot` and `gui`
 - local all-in-one launch for development and smoke tests
+
+Current supported stacks:
+- `arm + hand` direct `ros2_control`
+- `arm + hand + MoveIt`
+- `rover` direct `ros2_control`
+
+Planned next step:
+- unified `full system` bringup for rover + arm + hand after controller-manager and robot-description namespacing is aligned across subsystems
 
 Runtime modes:
 - `use_mock_hardware:=true` for local testing
@@ -109,6 +126,33 @@ Viewer only:
 
 ```bash
 ros2 launch silverhand_system_bringup silverhand_system_view.launch.py
+```
+
+Arm + hand direct control, no MoveIt:
+
+```bash
+ros2 launch silverhand_system_bringup silverhand_system_arm_hand_direct.launch.py use_mock_hardware:=true
+```
+
+Arm + hand with MoveIt in one process tree:
+
+```bash
+ros2 launch silverhand_system_bringup silverhand_system_arm_hand_moveit.launch.py use_mock_hardware:=true
+```
+
+Rover only:
+
+```bash
+ros2 launch silverhand_system_bringup silverhand_system_rover.launch.py use_mock_hardware:=true
+```
+
+Convenience wrappers:
+
+```bash
+ros2 launch silverhand_system_bringup silverhand_system_arm_hand_direct_mock.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_arm_hand_direct_real.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_rover_mock.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_rover_real.launch.py
 ```
 
 Robot machine, role-based launch:
@@ -170,6 +214,8 @@ ros2 launch silverhand_system_bringup silverhand_system_real.launch.py \
 
 - `silverhand_system_bringup` currently composes the arm and gripper into one MoveIt and control bringup with two controllers: `arm_controller` and `hand_controller`.
 - `silverhand_system_bringup` depends on the lower-layer arm and gripper packages, especially `silverhand_arm_model`, `silverhand_arm_control`, `silverhand_hand_model`, and `silverhand_hand_control`.
+- `silverhand_system_bringup` can also act as the top-level entrypoint for rover-only direct bringup by delegating to `silverhand_rover_bringup`.
+- running rover and arm/hand together in one launch file is intentionally deferred until both stacks expose non-conflicting `controller_manager` and `robot_description` endpoints
 - Planning configuration lives in this package, while hardware access stays in the lower-layer control packages.
 
 ## Two-Machine Startup Order
