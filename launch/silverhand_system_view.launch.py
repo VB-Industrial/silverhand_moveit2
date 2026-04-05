@@ -9,7 +9,7 @@ def generate_launch_description():
     rviz_config = LaunchConfiguration("rviz_config")
 
     description_file = PathJoinSubstitution(
-        [FindPackageShare("silverhand_arm_model"), "urdf", "silverhand.urdf.xacro"]
+        [FindPackageShare("silverhand_arm_model"), "urdf", "silverhand_arm.urdf.xacro"]
     )
     robot_description_content = Command(
         [
