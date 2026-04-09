@@ -9,8 +9,8 @@
   <xacro:arg name="arm_can_iface" default="can0"/>
   <xacro:arg name="arm_node_id" default="100"/>
   <xacro:arg name="arm_queue_len" default="1000"/>
-  <xacro:arg name="hand_can_iface" default="can0"/>
-  <xacro:arg name="hand_node_id" default="120"/>
+  <xacro:arg name="hand_can_iface" default="vcan1.0"/>
+  <xacro:arg name="hand_node_id" default="11"/>
   <xacro:arg name="hand_queue_len" default="1000"/>
 
   <xacro:silverhand_arm prefix=""/>
