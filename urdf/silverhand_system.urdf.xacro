@@ -2,7 +2,7 @@
 <robot name="silverhand_system" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:include filename="$(find silverhand_rover_model)/urdf/silverhand_rover.urdf.xacro"/>
   <xacro:include filename="$(find silverhand_rover_control)/ros2_control/silverhand_rover.ros2_control.xacro"/>
-  <xacro:include filename="$(find silverhand_arm_model)/urdf/silverhand_macro.urdf.xacro"/>
+  <xacro:include filename="$(find silverhand_arm_model)/urdf/silverhand_macro3.urdf.xacro"/>
   <xacro:include filename="$(find silverhand_arm_control)/ros2_control/silverhand.ros2_control.xacro"/>
   <xacro:include filename="$(find silverhand_hand_model)/urdf/silverhand_hand_macro.urdf.xacro"/>
   <xacro:include filename="$(find silverhand_hand_control)/ros2_control/silverhand_hand.ros2_control.xacro"/>
