@@ -1,6 +1,6 @@
 # silverhand_system_bringup
 
-Upper-level bringup package for SilverHand orchestration.
+Верхнеуровневый bringup-пакет для оркестрации SilverHand.
 
 Каноническая сущностная модель:
 
@@ -16,21 +16,21 @@ Upper-level bringup package for SilverHand orchestration.
 - `rover`: `mock`, `ros_control`
 - `system`: `mock`, `ros_control`, `moveit`
 
-`silverhand_system_bringup` теперь оркестрирует запуск. Источник правды для hardware transport defaults лежит в нижних пакетах:
+`silverhand_system_bringup` оркестрирует запуск. Источник правды для hardware transport defaults лежит в нижних пакетах:
 
-- [silverhand_arm_control/config/hardware_profiles.yaml](/home/r/silver_ws/src/silverhand_arm_control/config/hardware_profiles.yaml)
-- [silverhand_hand_control/config/hardware_profiles.yaml](/home/r/silver_ws/src/silverhand_hand_control/config/hardware_profiles.yaml)
-- [silverhand_rover_control/config/hardware_profiles.yaml](/home/r/silver_ws/src/silverhand_rover_control/config/hardware_profiles.yaml)
+- [silverhand_arm_control/config/hardware_profiles.yaml](../silverhand_arm_control/config/hardware_profiles.yaml)
+- [silverhand_hand_control/config/hardware_profiles.yaml](../silverhand_hand_control/config/hardware_profiles.yaml)
+- [silverhand_rover_control/config/hardware_profiles.yaml](../silverhand_rover_control/config/hardware_profiles.yaml)
 
-## What This Package Owns
+## Что делает пакет
 
-- arm-only MoveIt orchestration
-- arm+hand MoveIt orchestration
-- full-system rover+arm+hand orchestration
-- GUI entrypoints
-- RViz-only viewer
+- оркестрация MoveIt только для руки
+- оркестрация MoveIt для руки и захвата
+- оркестрация полной системы rover+arm+hand
+- точки входа GUI
+- просмотр только в RViz
 
-## Dependencies
+## Зависимости
 
 - Ubuntu 24.04
 - ROS 2 Jazzy
@@ -50,7 +50,7 @@ sudo apt-get install -y \
   ros-jazzy-xacro
 ```
 
-## Workspace Layout
+## Структура workspace
 
 Ожидаемый layout:
 
@@ -71,7 +71,7 @@ sudo apt-get install -y \
 ~/silver_ws/src/silverhand_system_description
 ```
 
-## Build
+## Сборка
 
 ```bash
 cd ~/silver_ws
@@ -80,7 +80,7 @@ colcon build
 source install/setup.bash
 ```
 
-## Canonical Launch Files
+## Канонические launch-файлы
 
 ### Arm
 
@@ -105,13 +105,13 @@ ros2 launch silverhand_system_bringup silverhand_system_rover_mock.launch.py
 ros2 launch silverhand_system_bringup silverhand_system_rover_ros_control.launch.py
 ```
 
-Low-level passthrough:
+Низкоуровневый passthrough:
 
 ```bash
 ros2 launch silverhand_system_bringup silverhand_system_rover.launch.py
 ```
 
-`silverhand_system_rover.launch.py` просто включает upstream [silverhand_rover_bringup.launch.py](/home/r/silver_ws/src/silverhand_rover_control/launch/silverhand_rover_bringup.launch.py). Значения по умолчанию для rover transport и IMU задаются в `silverhand_rover_control`.
+`silverhand_system_rover.launch.py` просто включает upstream [silverhand_rover_bringup.launch.py](../silverhand_rover_control/launch/silverhand_rover_bringup.launch.py). Значения по умолчанию для rover transport и IMU задаются в `silverhand_rover_control`.
 
 ### Full System
 
@@ -142,7 +142,7 @@ Full-system launch использует:
 
 Это позволяет держать совместимость с существующими arm controllers и MoveIt-конфигом, но убрать конфликт `base_link` между rover и arm.
 
-## GUI And Visualization
+## GUI и визуализация
 
 Arm GUI:
 
@@ -162,13 +162,13 @@ RViz-only viewer:
 ros2 launch silverhand_system_bringup silverhand_system_view_only_rviz.launch.py
 ```
 
-Role-based arm+hand MoveIt without RViz:
+Ролевой arm+hand MoveIt без RViz:
 
 ```bash
 ros2 launch silverhand_system_bringup silverhand_system_arm_hand_robot.launch.py use_mock_hardware:=true
 ```
 
-## Helper Scripts
+## Вспомогательные скрипты
 
 Канонические scripts:
 
@@ -189,13 +189,13 @@ ros2 launch silverhand_system_bringup silverhand_system_arm_hand_robot.launch.py
 ./scripts/start_system_view_only_rviz.sh
 ```
 
-Role-based convenience script:
+Скрипт для ролевого сценария:
 
 ```bash
 ./scripts/start_system_arm_hand_robot.sh
 ```
 
-## Environment Variables
+## Переменные окружения
 
 Общие:
 
@@ -204,7 +204,7 @@ Role-based convenience script:
 - `SILVERHAND_USE_RVIZ`
 - `SILVERHAND_USE_MOCK_HARDWARE`
 
-Rover overrides:
+Переопределения rover:
 
 - `SILVERHAND_ROVER_CAN_IFACE`
 - `SILVERHAND_ROVER_NODE_ID`
@@ -213,7 +213,7 @@ Rover overrides:
 - `SILVERHAND_ROVER_USE_POWER_BOARD`
 - `SILVERHAND_ROVER_POWER_BOARD_CLIENT_NODE_ID`
 
-Rover GUI:
+Параметры rover GUI:
 
 - `SILVERHAND_ROVER_GUI_HOST`
 - `SILVERHAND_ROVER_GUI_PORT`
@@ -225,18 +225,18 @@ Rover GUI:
 
 ## systemd
 
-System service template:
+Шаблон systemd-сервиса:
 
-- [silverhand-system-bringup@.service](/home/r/silver_ws/src/silverhand_system_bringup/systemd/system/silverhand-system-bringup@.service)
+- [silverhand-system-bringup@.service](systemd/system/silverhand-system-bringup@.service)
 
 Установка:
 
 ```bash
-sudo install -Dm644 /home/r/silver_ws/src/silverhand_system_bringup/systemd/system/silverhand-system-bringup@.service /etc/systemd/system/silverhand-system-bringup@.service
+sudo install -Dm644 systemd/system/silverhand-system-bringup@.service /etc/systemd/system/silverhand-system-bringup@.service
 sudo systemctl daemon-reload
 ```
 
-Канонические instance names:
+Канонические имена экземпляров:
 
 ```bash
 sudo systemctl start silverhand-system-bringup@mock
@@ -255,27 +255,27 @@ sudo systemctl start silverhand-system-bringup@gui_rover
 sudo systemctl start silverhand-system-bringup@view_only_rviz
 ```
 
-Role-based instance:
+Ролевой экземпляр:
 
 ```bash
 sudo systemctl start silverhand-system-bringup@arm_hand_robot
 ```
 
-## Implementation Notes
+## Примечания к реализации
 
-Full-system URDF:
+URDF полной системы:
 
-- [silverhand_system.urdf.xacro](/home/r/silver_ws/src/silverhand_system_bringup/urdf/silverhand_system.urdf.xacro)
+- [silverhand_system.urdf.xacro](urdf/silverhand_system.urdf.xacro)
 
-Full-system launch core:
+Ядро launch полной системы:
 
-- [silverhand_system_full_common.launch.py](/home/r/silver_ws/src/silverhand_system_bringup/launch/silverhand_system_full_common.launch.py)
+- [silverhand_system_full_common.launch.py](launch/silverhand_system_full_common.launch.py)
 
-Full-system SRDF:
+SRDF полной системы:
 
-- [system.srdf](/home/r/silver_ws/src/silverhand_system_bringup/config/system.srdf)
+- [system.srdf](config/system.srdf)
 
-## Verified
+## Проверено
 
 Проверено:
 
