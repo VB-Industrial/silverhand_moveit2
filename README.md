@@ -225,33 +225,40 @@ Rover GUI:
 
 ## systemd
 
-User service template:
+System service template:
 
-- [silverhand-system-bringup@.service](/home/r/silver_ws/src/silverhand_system_bringup/systemd/user/silverhand-system-bringup@.service)
+- [silverhand-system-bringup@.service](/home/r/silver_ws/src/silverhand_system_bringup/systemd/system/silverhand-system-bringup@.service)
+
+Установка:
+
+```bash
+sudo install -Dm644 /home/r/silver_ws/src/silverhand_system_bringup/systemd/system/silverhand-system-bringup@.service /etc/systemd/system/silverhand-system-bringup@.service
+sudo systemctl daemon-reload
+```
 
 Канонические instance names:
 
 ```bash
-systemctl --user start silverhand-system-bringup@mock
-systemctl --user start silverhand-system-bringup@ros_control
-systemctl --user start silverhand-system-bringup@moveit
-systemctl --user start silverhand-system-bringup@arm_mock
-systemctl --user start silverhand-system-bringup@arm_ros_control
-systemctl --user start silverhand-system-bringup@arm_moveit
-systemctl --user start silverhand-system-bringup@arm_hand_mock
-systemctl --user start silverhand-system-bringup@arm_hand_ros_control
-systemctl --user start silverhand-system-bringup@arm_hand_moveit
-systemctl --user start silverhand-system-bringup@rover_mock
-systemctl --user start silverhand-system-bringup@rover_ros_control
-systemctl --user start silverhand-system-bringup@gui_arm
-systemctl --user start silverhand-system-bringup@gui_rover
-systemctl --user start silverhand-system-bringup@view_only_rviz
+sudo systemctl start silverhand-system-bringup@mock
+sudo systemctl start silverhand-system-bringup@ros_control
+sudo systemctl start silverhand-system-bringup@moveit
+sudo systemctl start silverhand-system-bringup@arm_mock
+sudo systemctl start silverhand-system-bringup@arm_ros_control
+sudo systemctl start silverhand-system-bringup@arm_moveit
+sudo systemctl start silverhand-system-bringup@arm_hand_mock
+sudo systemctl start silverhand-system-bringup@arm_hand_ros_control
+sudo systemctl start silverhand-system-bringup@arm_hand_moveit
+sudo systemctl start silverhand-system-bringup@rover_mock
+sudo systemctl start silverhand-system-bringup@rover_ros_control
+sudo systemctl start silverhand-system-bringup@gui_arm
+sudo systemctl start silverhand-system-bringup@gui_rover
+sudo systemctl start silverhand-system-bringup@view_only_rviz
 ```
 
 Role-based instance:
 
 ```bash
-systemctl --user start silverhand-system-bringup@arm_hand_robot
+sudo systemctl start silverhand-system-bringup@arm_hand_robot
 ```
 
 ## Implementation Notes
